@@ -1,4 +1,4 @@
-# mbenchpy - a tiny command timer written in Python
+# mbenchpy - a tiny command timer
 
 `mbenchpy` is a simple command line timer written in Python. It's goal is to
 be similar to R's [microbench
