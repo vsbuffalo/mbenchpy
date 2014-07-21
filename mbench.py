@@ -44,7 +44,7 @@ if __name__ == "__main__":
     key_vals = [tuple(s.split('=')) for s in args.commands]
     keys = map(itemgetter(0), key_vals)
     if (len(set(keys)) != len(keys)):
-        raise argparse.ArgumentError('commands', 'duplicate command name')
+        raise argparse.ArgumentTypeError('commands must be in name="command" format, with unique names')
     commands = dict(key_vals)
 
     times = dict([(key, timed_run(cmd, args.n)) for key, cmd in commands.items()])
