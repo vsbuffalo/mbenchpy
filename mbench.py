@@ -12,8 +12,10 @@ def timed_run(command, n):
     Run a subprocess n times, and time it.
     """
     cmd = json.dumps(command).replace("'", "\\'") # for quote safety, FIXME
+    # FIXME: serious issue: no return value checking. timeit is horrible.
     cmd = "subprocess.call('bash -c %s', shell=True, stderr=open(os.devnull, 'wb'), stdout=open(os.devnull, 'wb'))" % cmd
-    return repeat(stmt=cmd, setup="import subprocess, os", number=n)
+    results = repeat(stmt=cmd, setup="import subprocess, os", number=n)
+    return [r/float(n) for r in results]
 
 def summary(x):
     """
@@ -36,6 +38,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Benchmark some commands.')
     parser.add_argument('-n', type=int, default=50, help="number of times")
+
     parser.add_argument('commands', type=str, nargs='+', metavar="N",
                         help='commands to run, in format \'name="command args"\'')
     args = parser.parse_args()
