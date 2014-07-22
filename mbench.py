@@ -7,13 +7,16 @@ import json
 
 DEVNULL = open(os.devnull, 'wb')
 
-def timed_run(command, n):
+def timed_run(name, command, n):
     """
     Run a subprocess n times, and time it.
     """
     cmd = json.dumps(command).replace("'", "\\'") # for quote safety, FIXME
-    # FIXME: serious issue: no return value checking. timeit is horrible.
-    cmd = "subprocess.call('bash -c %s', shell=True, stderr=open(os.devnull, 'wb'), stdout=open(os.devnull, 'wb'))" % cmd
+    cmd = """\
+retval = subprocess.call('bash -c %s', shell=True, stderr=open(os.devnull, 'wb'), stdout=open(os.devnull, 'wb'))
+if retval != 0:
+    raise subprocess.CalledProcessError(retval, '%s', None)
+""" % (cmd, name)
     results = repeat(stmt=cmd, setup="import subprocess, os", number=n)
     return [r/float(n) for r in results]
 
@@ -50,7 +53,7 @@ if __name__ == "__main__":
         raise argparse.ArgumentTypeError('commands must be in name="command" format, with unique names')
     commands = dict(key_vals)
 
-    times = dict([(key, timed_run(cmd, args.n)) for key, cmd in commands.items()])
+    times = dict([(key, timed_run(key, cmd, args.n)) for key, cmd in commands.items()])
     results = timing_table(times)
     print "\t".join(results.pop(0))
     for row in results:
