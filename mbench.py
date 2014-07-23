@@ -47,11 +47,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # extract programs
-    key_vals = [tuple(s.split('=')) for s in args.commands]
+    key_vals = [tuple(s.partition('=')) for s in args.commands]
     keys = map(itemgetter(0), key_vals)
     if (len(set(keys)) != len(keys)):
         raise argparse.ArgumentTypeError('commands must be in name="command" format, with unique names')
-    commands = dict(key_vals)
+    commands = dict([(k, v) for k, _, v in key_vals]) # ignore '=' in partition tuples
 
     times = dict([(key, timed_run(key, cmd, args.n)) for key, cmd in commands.items()])
     results = timing_table(times)
